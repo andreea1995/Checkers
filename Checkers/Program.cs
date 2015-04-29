@@ -13,7 +13,6 @@ namespace Checkers
             int playerpoints = 0;
             int computerpoints = 0;
             Console.WriteLine("Welcome to Checkers \n In your turn, first enter the piece's row and column number you wish to play, \n and then enter thr direction number(1/3/7/9)");
-
             while (wanttoplay.ToLower() != "no")
             {
                 int gameresult = Game();
@@ -36,7 +35,7 @@ namespace Checkers
 
         static double Minimax(char[,] state, int player, int depth)
         {//gameover, statevalue, nextstates,
-            if (depth == 0 || GameOver(state, player) != 2) //GameOver(state, player, PlayerInput) !=2    added
+            if (depth == 0 || GameOver(state) != 0) //GameOver(state, player, InputFromPlayer) !=0    added
                 return StateValue(state, player);
             double maxValue = double.NegativeInfinity;
 
@@ -56,18 +55,18 @@ namespace Checkers
         }
 
         private static List<char[,]> NextStates(char[,] state, int player)
-        //PlayerInput (char) changed from player (int)
+        //InputFromPlayer (char) changed from player (int)
         {
             List<char[,]> result = new List<char[,]>();
             for (int i = 0; i < state.GetLength(0); i++)
             {
-                for (int j = 0; j < state.GetLength(1); j++)
+                for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
                 {
 
                     if (state[i, j] == '-')
                     {
                         char[,] tempstate = (char[,])state.Clone();
-                        tempstate[i, j] = PlayerInput(player) ;
+                        tempstate[i, j] = InputFromPlayer(player) ;
                         result.Add(tempstate);
                     }
                 }
@@ -75,36 +74,47 @@ namespace Checkers
             return result;
         }
 
-        private static double StateValue(char[,] state, int player)
-        {
+        private static double StateValue(char[,] state, int player) //לשנות כך שיהיה שימוש ב GameOver
+        {   
+            /*
+            1) more pieces than the other (regular and kings calculation)
+            2) + eat and be eaten (not many points because it could lead to being eaten next turn) 
+               - be eaten and eat (")
+               * could be affected by if you have more pieces or not! (like atack and defence mode)
+            3) + eat with no harm (win many points)
+               - be eaten with no eating (lose many point)
+            4) traps (????????)
+            5) do not abandone 1st line
+            6) clear way towards king
+            7) building triangles and squares
+            8) double and triple eating
+            9)
+            10)
+            */
             //throw new NotImplementedException();
             double value = 0;
-            int[,] winarray = new int[,] { { 0, 1, 2 }, { 3, 4, 5 }, { 6, 7, 8 }, { 0, 3, 6 }, { 1, 4, 7 }, { 2, 5, 8 }, { 0, 4, 8 }, { 2, 4, 6 } };
-            for (int i = 0; i < winarray.GetLength(0); i++)
-            {
-                if (state[winarray[i, 0] / 3, winarray[i, 0] % 3] == PlayerInput(player) && state[winarray[i, 1] / 3, winarray[i, 1] % 3] == PlayerInput(player) && state[winarray[i, 2] / 3, winarray[i, 2] % 3] == PlayerInput(player))
-                    value = 100;
-                else if (state[winarray[i, 0] / 3, winarray[i, 0] % 3] == PlayerInput(player) && state[winarray[i, 1] / 3, winarray[i, 1] % 3] == PlayerInput(player) && state[winarray[i, 2] / 3, winarray[i, 2] % 3] == PlayerInput(player))
-                    value = -100;
-            }
+                if (GameOver(state)==player)
+                    return 1000;
+                else if (GameOver(state) == -player)
+                    return -1000;
             return value;
         }
-        static char[,] AddXO(char[,] board, int line, int column, int player)
+        static char[,] AddXO(char[,] state, int line, int column, int player)
         {
-            if (board[line - 1, column - 1] == '-')
+            if (state[line - 1, column - 1] == '-')
             {
-                board[line - 1, column - 1] = PlayerInput(player);
+                state[line - 1, column - 1] = InputFromPlayer(player);
 
             }
-            return board;
+            return state;
         }
-        static void PrintBoard(char[,] board)
+        static void PrintState(char[,] state)
         {
-            for (int i = 0; i < board.GetLength(0); i++)
+            for (int i = 0; i < state.GetLength(0); i++)
             {
-                for (int j = 0; j < board.GetLength(1); j++)
+                for (int j = 0; j < state.GetLength(1); j++)
                 {
-                    Console.Write(board[i, j] + "  ");
+                    Console.Write(state[i, j] + "  ");
                 }
                 Console.WriteLine("\n");
             }
@@ -119,33 +129,38 @@ namespace Checkers
             else
                 Console.WriteLine(playerpoints + " - " + computerpoints + " The computer leads!");
         }
-        static char PlayerInput(int player)
+        static char InputFromPlayer(int player)
         {
             if (player == 1)
                 return 'X';
             return 'O';
         }
-        static int GameOver(char[,] board, int player)
+        static int PlayerFromInput(char input)
         {
-            if (StateValue(board, player) == 0)
-            {
-                if (IsFull(board))
-                    return 0;
-                return 2;
-            }
-            else if (Convert.ToInt32(StateValue(board, player)) >= 100)
+            if (input == 'X')
                 return 1;
-            else
-                return -1;
+            return -1;
         }
-        static bool IsFull(char[,] board)
+        static int GameOver(char[,] state) //updated
         {
-            foreach (char i in board)
+            bool flagwhiteO = false;
+            bool flagblackX = false;
+            for (int i=0; i<state.GetLength(0); i++)
             {
-                if (i == '-')
-                    return false;
+                for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
+                {
+                    if (state[i,j] == 'X')
+                        flagblackX = true;
+                    else if (state[i, j] == 'O')
+                        flagwhiteO = true;
             }
-            return true;
+            }
+            if(!flagwhiteO) //no more white pieces (O)
+                return 1; //computer won
+            else if (!flagblackX) //no more black pieces (X)
+                return -1; //player won
+            else
+                return 0;
         }
         static int Game()
         {
@@ -158,27 +173,29 @@ namespace Checkers
             else
                 player = 1;
 
-            char[,] board = new char[8, 8];
-            for (int i = 0; i < board.GetLength(0); i++) 
-            {
-                for (int j = 0; j < board.GetLength(1); j++)
-                    board[i, j] = '-';
-            }
-            PrintBoard(board);
+            char[,] state = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
+                                            {'X','-','X','-','X','-','X','-'},
+                                            {'-','X','-','X','-','X','-','X'},                                           
+                                            {'-','-','-','-','-','-','-','-'},
+                                            {'-','-','-','-','-','-','-','-'},
+                                            {'O','-','O','-','O','-','O','-'},
+                                            {'-','O','-','O','-','O','-','O'},
+                                            {'O','-','O','-','O','-','O','-'}};
+            PrintState(state);
             do
             {
                 if (player == -1)
-                    board = PlayerTurn(board);
+                    state = PlayerTurn(state);
                 else
-                    board = ComputerTurn(board, turncounter, player);
-                PrintBoard(board);
+                    state = ComputerTurn(state, turncounter, player);
+                PrintState(state);
                 turncounter++;
                 player = -player;
-            } while (GameOver(board, player) == 2);
+            } while (GameOver(state) == 0);
 
-            return GameOver(board, -player);
+            return GameOver(state);
         }
-        static char[,] PlayerTurn(char[,] board)
+        static char[,] PlayerTurn(char[,] state)
         {
             while (true)
             {
@@ -188,20 +205,20 @@ namespace Checkers
                 int column = int.Parse(Console.ReadLine());
                 if (row <= 3 && column <= 3 && row >= 1 && column >= 1)
                 {
-                    if (board[row - 1, column - 1] == '-')
+                    if (state[row - 1, column - 1] == '-')
                     {
-                        return AddXO(board, row, column, -1);
+                        return AddXO(state, row, column, -1);
                     }
                 }
                 Console.WriteLine("Learn to play... Please enter row and col again");
             }
         }
-        static char[,] ComputerTurn(char[,] board, int turncounter, int player)
+        static char[,] ComputerTurn(char[,] state, int turncounter, int player)
         {
             Console.WriteLine("Computer's turn:");
             double idealscore = double.PositiveInfinity;
             char[,] idealstate = null;
-            foreach (char[,] nextstate in NextStates(board, PlayerInput(player)))
+            foreach (char[,] nextstate in NextStates(state, InputFromPlayer(player)))
             {
                 double score = Minimax(nextstate, -1, 4);
                 if (score < idealscore)
@@ -209,13 +226,20 @@ namespace Checkers
                     idealscore = score;
                     idealstate = nextstate;
                 }
-                //!!Randomising option!! if (Minimax(nextstate, -1, 4) = idialscore)
+                //!!Randomising option!! if (Minimax(nextstate, -1, 4) = idealscore)
                 //{
-                //    in
+                //    
                 //    if(
                 //}
             }
             return idealstate;
         }
+        /*           for (int i=0; i<state.GetLength(0); i++)
+       {
+           for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
+           {
+           
+           }
+       }*/
     }
 }
