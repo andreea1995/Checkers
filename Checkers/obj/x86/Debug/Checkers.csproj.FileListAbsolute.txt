@@ -1,0 +1,4 @@
+c:\users\user1\documents\visual studio 2010\Projects\Checkers\Checkers\bin\Debug\Checkers.exe
+c:\users\user1\documents\visual studio 2010\Projects\Checkers\Checkers\bin\Debug\Checkers.pdb
+c:\users\user1\documents\visual studio 2010\Projects\Checkers\Checkers\obj\x86\Debug\Checkers.exe
+c:\users\user1\documents\visual studio 2010\Projects\Checkers\Checkers\obj\x86\Debug\Checkers.pdb
