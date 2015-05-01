@@ -7,7 +7,7 @@ namespace Checkers
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main(string[] args) //OK
         {
             string wanttoplay = "yes";
             int playerpoints = 0;
@@ -33,41 +33,66 @@ namespace Checkers
 
         }
 
-        static double Minimax(char[,] state, int player, int depth)
+
+        static double Minimax(char[,] state, int player, int depth) //OK (needs checking)
         {//gameover, statevalue, nextstates,
-            if (depth == 0 || GameOver(state) != 0) //GameOver(state, player, InputFromPlayer) !=0    added
-                return StateValue(state, player);
+            double statescore = StateValue(state, player);
+            if (depth == 0 || GameOver(state) != 0)
+                return statescore;
             double maxValue = double.NegativeInfinity;
-
-
             foreach (char[,] nextState in NextStates(state, player))
             {
-                //if (depth == 10)
-                //    Console.WriteLine();
                 double nextValue = -Minimax(nextState, -player, depth - 1);
                 if (nextValue > maxValue)
                     maxValue = nextValue;
             }
-
             if (double.IsNegativeInfinity(maxValue))
-                return StateValue(state, player);
+                return statescore;
             return maxValue;
         }
 
-        private static List<char[,]> NextStates(char[,] state, int player)
-        //InputFromPlayer (char) changed from player (int)
+
+        private static List<char[,]> NextStates(char[,] state, int player) //add kings. + option to add multiple eating in here.
         {
             List<char[,]> result = new List<char[,]>();
-            for (int i = 0; i < state.GetLength(0); i++)
+            for (int i = (1 - player) / 2; i < state.GetLength(0) - 1; i++) //change to (int i = 0; i < state.GetLength(0); i++) if added kings to function
             {
-                for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
+                for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2) 
                 {
 
-                    if (state[i, j] == '-')
+                    if (state[i, j] == InputFromPlayer(player))
                     {
-                        char[,] tempstate = (char[,])state.Clone();
-                        tempstate[i, j] = InputFromPlayer(player) ;
-                        result.Add(tempstate);
+                        if (state[i + player, j - 1] == '-' && j > 0)
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j - 1] = InputFromPlayer(player);
+                            result.Add(tempstate);
+                        }
+                        else if (state[i + player, j + 1] == '-' && j<state.GetLength(1)-1)
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j + 1] = InputFromPlayer(player);
+                            result.Add(tempstate);
+                        }
+                        else if (state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-' && j > 1)
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j - 1] = '-';
+                            tempstate[i + 2*player, j - 2] = InputFromPlayer(player);
+                            result.Add(tempstate);
+                        }
+                        else if (state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-' && j < state.GetLength(1) - 2)
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j + 1] = '-';
+                            tempstate[i + 2 * player, j + 2] = InputFromPlayer(player);
+                            result.Add(tempstate);
+                        }
+                        //+kings?
                     }
                 }
             }
@@ -93,21 +118,58 @@ namespace Checkers
             */
             //throw new NotImplementedException();
             double value = 0;
-                if (GameOver(state)==player)
+            int whowon = GameOver(state);
+            if (whowon == player)
                     return 1000;
-                else if (GameOver(state) == -player)
+            else if (whowon == -player)
                     return -1000;
             return value;
         }
-        static char[,] AddXO(char[,] state, int line, int column, int player)
-        {
-            if (state[line - 1, column - 1] == '-')
-            {
-                state[line - 1, column - 1] = InputFromPlayer(player);
 
+
+        static char[,] MovePiece(char[,] state, int i, int j, int player, int dir)
+        {
+            if (i >= 0 && i < state.GetLength(0) && j >= 0 && j < state.GetLength(1))
+            {
+                if (i!=0 && state[i, j] == InputFromPlayer(player) && (dir==7 || dir==9))
+                {  
+                    if(state[i-1,dir-8]=='-')
+                    {
+                        state[i, j] = '-';
+                        state[i - 1, dir - 8] = 'O';
+                    }
+                    else if (i != 1 && state[i - 1, dir - 8] == 'X' && state[i - 2, 2*(dir - 8)] == '-')
+                    {
+                        state[i, j] = '-';
+                        state[i - 1, dir - 8] = '-';
+                        state[i - 2, 2 * (dir - 8)] = 'O';
+                    }
+                    else
+                    {
+                        Console.WriteLine("you can't move your piece there");
+                        return null;
+                    }
+                }
+                else if (state[i, j] == 'W' && (dir==1 || dir==3 || dir==7 || dir==9)) //complete kings
+                {
+                    //if((i==0
+                }
+                else
+                {
+                    Console.WriteLine("Something wrong with the player's location or the direction you chose");
+                    return null;
+                }
+                return null; //not really null!!!!!! sould be the new state
+            }
+            else
+            {
+                Console.WriteLine("Something wrong with row or col number");
+                return null;
             }
             return state;
         }
+
+
         static void PrintState(char[,] state)
         {
             for (int i = 0; i < state.GetLength(0); i++)
@@ -120,6 +182,8 @@ namespace Checkers
             }
             Console.WriteLine();
         }
+
+
         static void WhoLeads(int playerpoints, int computerpoints)
         {
             if (playerpoints > computerpoints)
@@ -202,15 +266,18 @@ namespace Checkers
                 Console.WriteLine("enter row");
                 int row = int.Parse(Console.ReadLine());
                 Console.WriteLine("enter column");
-                int column = int.Parse(Console.ReadLine());
-                if (row <= 3 && column <= 3 && row >= 1 && column >= 1)
+                int col = int.Parse(Console.ReadLine());
+                Console.WriteLine("enter direction (for regular player 7/9, for king 1/3/7/9)");
+                int dir = int.Parse(Console.ReadLine());
+                char[,] newstate = MovePiece(state, row-1, col-1, -1, dir);
+                if (row <= state.GetLength(0) && col <= state.GetLength(1) && row >= 1 && col >= 1)
                 {
-                    if (state[row - 1, column - 1] == '-')
+                    if (newstate!=null)
                     {
-                        return AddXO(state, row, column, -1);
+                        return newstate;
                     }
                 }
-                Console.WriteLine("Learn to play... Please enter row and col again");
+                Console.WriteLine("Please enter row, column and direction again");
             }
         }
         static char[,] ComputerTurn(char[,] state, int turncounter, int player)
