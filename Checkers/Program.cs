@@ -55,28 +55,28 @@ namespace Checkers
         private static List<char[,]> NextStates(char[,] state, int player) //add kings. + option to add multiple eating in here.
         {
             List<char[,]> result = new List<char[,]>();
-            for (int i = (1 - player) / 2; i < state.GetLength(0) - 1; i++) //change to (int i = 0; i < state.GetLength(0); i++) if added kings to function
+            for (int i = Convert.ToInt32((1 - player) / 2); i < state.GetLength(0) - 1; i++) //change to (int i = 0; i < state.GetLength(0); i++) if added kings to function
             {
                 for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2) 
                 {
 
                     if (state[i, j] == InputFromPlayer(player))
                     {
-                        if (state[i + player, j - 1] == '-' && j > 0)
+                        if (j > 0 && (player==1 && i<7 || player==-1 && i>0) && state[i + player, j - 1] == '-')
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j - 1] = InputFromPlayer(player);
                             result.Add(tempstate);
                         }
-                        else if (state[i + player, j + 1] == '-' && j<state.GetLength(1)-1)
+                        else if (j<state.GetLength(1)-1 && (player==1 && i<7 || player==-1 && i>0) && state[i + player, j + 1] == '-')
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j + 1] = InputFromPlayer(player);
                             result.Add(tempstate);
                         }
-                        else if (state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-' && j > 1)
+                        else if (j > 1 && (player==1 && i<6 || player==-1 && i>1)  && state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-')
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
@@ -84,7 +84,7 @@ namespace Checkers
                             tempstate[i + 2*player, j - 2] = InputFromPlayer(player);
                             result.Add(tempstate);
                         }
-                        else if (state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-' && j < state.GetLength(1) - 2)
+                        else if (j < state.GetLength(1) - 2 && (player==1 && i<6 || player==-1 && i>1) && state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-')
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
@@ -129,20 +129,23 @@ namespace Checkers
 
         static char[,] MovePiece(char[,] state, int i, int j, int player, int dir)
         {
+
             if (i >= 0 && i < state.GetLength(0) && j >= 0 && j < state.GetLength(1))
             {
                 if (i!=0 && state[i, j] == InputFromPlayer(player) && (dir==7 || dir==9))
                 {  
-                    if(state[i-1,dir-8]=='-')
+                    if(state[i-1, j + dir-8]=='-')
                     {
                         state[i, j] = '-';
-                        state[i - 1, dir - 8] = 'O';
+                        state[i - 1, j + dir - 8] = 'O';
+                        return state;
                     }
-                    else if (i != 1 && state[i - 1, dir - 8] == 'X' && state[i - 2, 2*(dir - 8)] == '-')
+                    else if (i != 1 && state[i - 1, j + dir - 8] == 'X' && state[i - 2, j + 2*(dir - 8)] == '-')
                     {
                         state[i, j] = '-';
-                        state[i - 1, dir - 8] = '-';
-                        state[i - 2, 2 * (dir - 8)] = 'O';
+                        state[i - 1, j + dir - 8] = '-';
+                        state[i - 2,j + 2 * (dir - 8)] = 'O';
+                        return state;
                     }
                     else
                     {
@@ -166,7 +169,7 @@ namespace Checkers
                 Console.WriteLine("Something wrong with row or col number");
                 return null;
             }
-            return state;
+
         }
 
 
@@ -277,6 +280,7 @@ namespace Checkers
                         return newstate;
                     }
                 }
+                PrintState(state);
                 Console.WriteLine("Please enter row, column and direction again");
             }
         }
@@ -285,7 +289,7 @@ namespace Checkers
             Console.WriteLine("Computer's turn:");
             double idealscore = double.PositiveInfinity;
             char[,] idealstate = null;
-            foreach (char[,] nextstate in NextStates(state, InputFromPlayer(player)))
+            foreach (char[,] nextstate in NextStates(state, player))
             {
                 double score = Minimax(nextstate, -1, 4);
                 if (score < idealscore)

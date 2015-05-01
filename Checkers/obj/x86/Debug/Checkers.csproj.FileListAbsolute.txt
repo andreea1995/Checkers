@@ -6,3 +6,4 @@ C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\obj\x86\Debug\Checkers.exe
 C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\obj\x86\Debug\Checkers.pdb
 C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\bin\Debug\Checkers.exe
 C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\bin\Debug\Checkers.pdb
+C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\obj\x86\Debug\Checkers.csprojResolveAssemblyReference.cache
