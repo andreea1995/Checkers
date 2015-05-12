@@ -62,34 +62,38 @@ namespace Checkers
 
                     if (state[i, j] == InputFromPlayer(player))
                     {
-                        if (j > 0 && (player==1 && i<7 || player==-1 && i>0) && state[i + player, j - 1] == '-')
+                        if (IsAbleLeft(state, player, i, j))
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j - 1] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
                             result.Add(tempstate);
                         }
-                        else if (j<state.GetLength(1)-1 && (player==1 && i<7 || player==-1 && i>0) && state[i + player, j + 1] == '-')
+                        if (IsAbleRight(state, player, i, j))
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j + 1] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
                             result.Add(tempstate);
                         }
-                        else if (j > 1 && (player==1 && i<6 || player==-1 && i>1)  && state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-')
+                        if (IsAbleEatingLeft(state, player, i, j))
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j - 1] = '-';
                             tempstate[i + 2*player, j - 2] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
                             result.Add(tempstate);
                         }
-                        else if (j < state.GetLength(1) - 2 && (player==1 && i<6 || player==-1 && i>1) && state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-')
+                        if (IsAbleEatingRight(state,player,i,j))
                         {
                             char[,] tempstate = (char[,])state.Clone();
                             tempstate[i, j] = '-';
                             tempstate[i + player, j + 1] = '-';
                             tempstate[i + 2 * player, j + 2] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
                             result.Add(tempstate);
                         }
                         //+kings?
@@ -119,10 +123,8 @@ namespace Checkers
             //throw new NotImplementedException();
             double value = 0;
             int whowon = GameOver(state);
-            if (whowon == player)
-                    return 1000;
-            else if (whowon == -player)
-                    return -1000;
+            if (whowon != 0)
+                    return 1000*player*whowon;
             return value;
         }
 
@@ -275,6 +277,7 @@ namespace Checkers
                 char[,] newstate = MovePiece(state, row-1, col-1, -1, dir);
                 if (row <= state.GetLength(0) && col <= state.GetLength(1) && row >= 1 && col >= 1)
                 {
+                    newstate = Burned(state, newstate, -1);
                     if (newstate!=null)
                     {
                         return newstate;
@@ -304,6 +307,77 @@ namespace Checkers
                 //}
             }
             return idealstate;
+        }
+        static char[,] Burned(char[,] state, char[,] newstate, int player)
+        {
+            char[,] burnstate = new char[8,8];
+            int counterstate=0, counternewstate=0;
+            int addi=0, addj=0;
+            // בודק את שני המערכים אחד מול השני - אם מספר השחקנים שונה (אכילה) לא שורף
+            for (int i = 0; i < state.GetLength(0); i++)
+            {
+                for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
+                {
+                    if (state[i, j] == newstate[i, j])
+                    {
+                        burnstate[i, j] = state[i, j];
+                    }
+                    else
+                    {
+                        burnstate[i, j] = '-';
+                        if (state[i, j] != '-')
+                            counterstate++;
+                        if (newstate[i, j] != '-')
+                        {
+                            counternewstate++;
+                            if(newstate[i, j] == InputFromPlayer(player))
+                                addi = i;
+                                addj = j;
+                        }
+                    }
+                }
+            }
+            if (counternewstate == counterstate)
+                {
+                    for (int i = 0; i < state.GetLength(0); i++)
+                    {
+                        for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
+                        {
+                            if(IsAbleEatingLeft(burnstate,player,i,j) || IsAbleEatingRight(burnstate,player,i,j))
+                            {
+                                burnstate[i, j] = '-';
+                                if(!(addi == 0 && addj == 0))
+                                    burnstate[addi, addj] = InputFromPlayer(player);
+                                return burnstate;
+                            }
+                        }
+                     }
+                }
+            return newstate;
+        }
+        static bool IsAbleLeft(char[,] state, int player, int i, int j)
+        {
+            if (j > 0 && (player == 1 && i < 7 || player == -1 && i > 0) && state[i + player, j - 1] == '-')
+                return true;
+            return false;
+        }
+        static bool IsAbleRight(char[,] state, int player, int i, int j)
+        {
+            if (j < state.GetLength(1) - 1 && (player == 1 && i < 7 || player == -1 && i > 0) && state[i + player, j + 1] == '-')
+                return true;
+            return false;
+        }
+        static bool IsAbleEatingLeft(char[,] state, int player, int i, int j)
+        {
+            if (j > 1 && (player == 1 && i < 6 || player == -1 && i > 1) && state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-')
+                return true;
+            return false;
+        }
+        static bool IsAbleEatingRight(char[,] state, int player, int i, int j)
+        {
+            if (j < state.GetLength(1) - 2 && (player == 1 && i < 6 || player == -1 && i > 1) && state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-')
+                return true;
+            return false;
         }
         /*           for (int i=0; i<state.GetLength(0); i++)
        {
