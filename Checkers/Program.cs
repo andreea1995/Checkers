@@ -60,6 +60,7 @@ namespace Checkers
                 for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2) 
                 {
 
+<<<<<<< HEAD
                         if (IsYours(state, i, j, player))
                         {
                             if (IsAbleLeft(state, player, i, j))
@@ -110,6 +111,45 @@ namespace Checkers
                             }
                             //+kings?
                         
+=======
+                    if (state[i, j] == InputFromPlayer(player))
+                    {
+                        if (IsAbleLeft(state, player, i, j))
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j - 1] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
+                            result.Add(tempstate);
+                        }
+                        if (IsAbleRight(state, player, i, j))
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j + 1] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
+                            result.Add(tempstate);
+                        }
+                        if (IsAbleEatingLeft(state, player, i, j))
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j - 1] = '-';
+                            tempstate[i + 2*player, j - 2] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
+                            result.Add(tempstate);
+                        }
+                        if (IsAbleEatingRight(state,player,i,j))
+                        {
+                            char[,] tempstate = (char[,])state.Clone();
+                            tempstate[i, j] = '-';
+                            tempstate[i + player, j + 1] = '-';
+                            tempstate[i + 2 * player, j + 2] = InputFromPlayer(player);
+                            tempstate = Burned(state, tempstate, player);
+                            result.Add(tempstate);
+                        }
+                        //+kings?
+>>>>>>> origin/master
                     }
                 }
             }
@@ -334,7 +374,12 @@ namespace Checkers
                 char[,] newstate = MovePiece(state, row-1, col-1, -1, dir);
                 if (row <= state.GetLength(0) && col <= state.GetLength(1) && row >= 1 && col >= 1)
                 {
+<<<<<<< HEAD
                     if (newstate != null)
+=======
+                    newstate = Burned(state, newstate, -1);
+                    if (newstate!=null)
+>>>>>>> origin/master
                     {
                         newstate = Burned(state, newstate, -1);
                         return newstate;
@@ -369,14 +414,20 @@ namespace Checkers
         {
             char[,] burnstate = new char[8,8];
             int counterstate=0, counternewstate=0;
+<<<<<<< HEAD
             char temp = InputFromPlayer(player);
+=======
+>>>>>>> origin/master
             int addi=0, addj=0;
             // בודק את שני המערכים אחד מול השני - אם מספר השחקנים שונה (אכילה) לא שורף
             for (int i = 0; i < state.GetLength(0); i++)
             {
                 for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
                 {
+<<<<<<< HEAD
                     
+=======
+>>>>>>> origin/master
                     if (state[i, j] == newstate[i, j])
                     {
                         burnstate[i, j] = state[i, j];
@@ -389,12 +440,18 @@ namespace Checkers
                         if (newstate[i, j] != '-')
                         {
                             counternewstate++;
+<<<<<<< HEAD
                             if (IsYours(newstate,i,j,player))
                             {
                                 addi = i;
                                 addj = j;
                                 temp = newstate[i, j];
                             }
+=======
+                            if(newstate[i, j] == InputFromPlayer(player))
+                                addi = i;
+                                addj = j;
+>>>>>>> origin/master
                         }
                     }
                 }
@@ -409,7 +466,11 @@ namespace Checkers
                             {
                                 burnstate[i, j] = '-';
                                 if(!(addi == 0 && addj == 0))
+<<<<<<< HEAD
                                     burnstate[addi, addj] = temp;
+=======
+                                    burnstate[addi, addj] = InputFromPlayer(player);
+>>>>>>> origin/master
                                 return burnstate;
                             }
                         }
@@ -431,12 +492,17 @@ namespace Checkers
         }
         static bool IsAbleEatingLeft(char[,] state, int player, int i, int j)
         {
+<<<<<<< HEAD
             if (j > 1 && (player == 1 && i < 6 || player == -1 && i > 1) && IsEnemy(state, i + player, j - 1, player) && state[i + 2 * player, j - 2] == '-')
+=======
+            if (j > 1 && (player == 1 && i < 6 || player == -1 && i > 1) && state[i + player, j - 1] == InputFromPlayer(-player) && state[i + 2 * player, j - 2] == '-')
+>>>>>>> origin/master
                 return true;
             return false;
         }
         static bool IsAbleEatingRight(char[,] state, int player, int i, int j)
         {
+<<<<<<< HEAD
             if (j < state.GetLength(1) - 2 && (player == 1 && i < 6 || player == -1 && i > 1) && IsEnemy(state,i + player, j + 1, player) && state[i + 2 * player, j + 2] == '-')
                 return true;
             return false;
@@ -472,6 +538,9 @@ namespace Checkers
         static bool IsYours(char[,] state, int i, int j, int player)
         {
             if (state[i, j] == KingInputFromPlayer(player) || state[i, j] == InputFromPlayer(player))
+=======
+            if (j < state.GetLength(1) - 2 && (player == 1 && i < 6 || player == -1 && i > 1) && state[i + player, j + 1] == InputFromPlayer(-player) && state[i + 2 * player, j + 2] == '-')
+>>>>>>> origin/master
                 return true;
             return false;
         }
