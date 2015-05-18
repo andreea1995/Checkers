@@ -9,27 +9,27 @@ namespace Checkers
     {
         static void Main(string[] args) //OK
         {
-            //string wanttoplay = "yes";
-            //int playerpoints = 0;
-            //int computerpoints = 0;
-            //Console.WriteLine("Welcome to Checkers \n In your turn, first enter the piece's row and column number you wish to play, \n and then enter thr direction number(1/3/7/9)");
-            //while (wanttoplay.ToLower() != "no")
-            //{
-            //    int gameresult = Game();
-            //    if (gameresult == 1)
-            //    {
-            //        Console.WriteLine("The computer won!!");
-            //        computerpoints++;
-            //    }
-            //    else if (gameresult == -1)
-            //    {
-            //        Console.WriteLine("You won!!");
-            //        playerpoints++;
-            //    }
-            //    WhoLeads(playerpoints, computerpoints);
-            //    Console.WriteLine("Do you want to continue?");
-            //    wanttoplay = Console.ReadLine();
-            //}
+            string wanttoplay = "yes";
+            int playerpoints = 0;
+            int computerpoints = 0;
+            Console.WriteLine("Welcome to Checkers \n In your turn, first enter the piece's row and column number you wish to play, \n and then enter thr direction number(1/3/7/9)");
+            while (wanttoplay.ToLower() != "no")
+            {
+                int gameresult = Game();
+                if (gameresult == 1)
+                {
+                    Console.WriteLine("The computer won!!");
+                    computerpoints++;
+                }
+                else if (gameresult == -1)
+                {
+                    Console.WriteLine("You won!!");
+                    playerpoints++;
+                }
+                WhoLeads(playerpoints, computerpoints);
+                Console.WriteLine("Do you want to continue?");
+                wanttoplay = Console.ReadLine();
+            }
             //char[,] state = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
             //                                {'X','-','X','-','X','-','X','-'},
             //                                {'-','B','-','B','-','B','-','-'},                                           
@@ -46,42 +46,60 @@ namespace Checkers
             //                                {'O','-','O','-','O','-','-','-'},
             //                                {'-','O','-','O','-','O','-','O'},
             //                                {'O','-','O','-','O','-','O','-'}};
-            char[,] state = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},                                           
-                                            {'B','-','-','-','-','-','-','-'},
-                                            {'-','O','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'}};
-            Console.WriteLine("original state:");
-            PrintState(state);
-         //char[,] newstate = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
-         //                                   {'X','-','X','-','X','-','-','-'},
-         //                                   {'-','B','-','B','-','-','-','B'},                                           
-         //                                   {'-','-','-','-','X','-','-','-'},
-         //                                   {'-','-','-','-','-','-','-','-'},
-         //                                   {'O','-','O','-','O','-','-','-'},
-         //                                   {'-','O','-','O','-','O','-','O'},
-         //                                   {'O','-','O','-','O','-','O','-'}};
+            //char[,] state = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},                                           
+            //                                {'-','-','X','-','-','-','-','-'},
+            //                                {'-','O','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'}};
+            //char[,] state = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','X','-','-','-','-','-'},
+            //                                {'-','-','-','X','-','-','-','X'},                                           
+            //                                {'-','-','-','-','-','-','X','-'},
+            //                                {'-','-','-','-','-','O','-','-'},
+            //                                {'-','-','-','-','O','-','O','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'}};
 
-            char[,] newstate = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},                                           
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','B','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'},
-                                            {'-','-','-','-','-','-','-','-'}};
+            //Console.WriteLine("original state:");
+            //PrintState(state);
+            //char[,] newstate = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','X','-','-','-','-','-'},
+            //                                {'-','-','-','X','-','-','-','X'},                                           
+            //                                {'-','-','-','-','-','-','X','-'},
+            //                                {'-','-','-','O','-','O','-','-'},
+            //                                {'-','-','-','-','-','-','O','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'}};
+            //char[,] newstate = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
+            //                                   {'X','-','X','-','X','-','-','-'},
+            //                                   {'-','B','-','B','-','-','-','B'},                                           
+            //                                   {'-','-','-','-','X','-','-','-'},
+            //                                   {'-','-','-','-','-','-','-','-'},
+            //                                   {'O','-','O','-','O','-','-','-'},
+            //                                   {'-','O','-','O','-','O','-','O'},
+            //                                   {'O','-','O','-','O','-','O','-'}};
+
+            //char[,] newstate = new char[8, 8] {{'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},                                           
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','B','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'},
+            //                                {'-','-','-','-','-','-','-','-'}};
             //char[,] newstate = MovePiece(state, 6 - 1, 1 - 1, -1, 9);
-            Console.WriteLine("\n after movepiece:");
-            PrintState(newstate);
-            newstate = Burned(state, newstate, 1);
-            Console.WriteLine("\n after burned:");
-            PrintState(newstate);
-            newstate = BecomeKing(newstate, 1);
-            Console.WriteLine("\n after Becomeking:");
-            PrintState(newstate);
+            //char[,] newstate = ComputerTurn(state, 1);
+            //Console.WriteLine("\n after computerturn:");
+            //PrintState(newstate);
+            //newstate = Burned(state, newstate, -1);
+            //Console.WriteLine("\n after burned:");
+            //PrintState(newstate);
+            //newstate = BecomeKing(newstate, -1);
+            //Console.WriteLine("\n after Becomeking:");
+            //PrintState(newstate);
             Console.ReadKey();
 
         }
@@ -168,9 +186,18 @@ namespace Checkers
                 tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
             tempstate[i, j] = '-';
             if (diffi == 2)
-                tempstate[i + player, j + diffj] = '-';
+                tempstate[i + player, j + diffj/2] = '-';
+            //Console.WriteLine("tempstate (" + diffi + ", " + diffj + ")" + "after moving:");
+            //PrintState(tempstate);
+            //Console.WriteLine("\n\n");
             tempstate = Burned(state, tempstate, player);
+            //Console.WriteLine("after burn:");
+            //PrintState(tempstate);
+            //Console.WriteLine("\n\n");
             tempstate = BecomeKing(tempstate, player);
+            //Console.WriteLine("tempstate:");
+            //PrintState(tempstate);
+            //Console.WriteLine("\n\n");
             result.Add(tempstate);
         }
 
@@ -360,7 +387,7 @@ namespace Checkers
 
             char[,] state = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
                                             {'X','-','X','-','X','-','X','-'},
-                                            {'-','B','-','B','-','B','-','B'},                                           
+                                            {'-','X','-','X','-','X','-','X'},                                           
                                             {'-','-','-','-','-','-','-','-'},
                                             {'-','-','-','-','-','-','-','-'},
                                             {'O','-','O','-','O','-','O','-'},
@@ -372,7 +399,7 @@ namespace Checkers
                 if (player == -1)
                     state = PlayerTurn(state);
                 else
-                    state = ComputerTurn(state, turncounter, player);
+                    state = ComputerTurn(state, player);
                 PrintState(state);
                 turncounter++;
                 player = -player;
@@ -404,14 +431,14 @@ namespace Checkers
                 Console.WriteLine("Please enter row, column and direction again");
             }
         }
-        static char[,] ComputerTurn(char[,] state, int turncounter, int player)
+        static char[,] ComputerTurn(char[,] state, int player)
         {
             Console.WriteLine("Computer's turn:");
             double idealscore = double.PositiveInfinity;
             char[,] idealstate = null;
             foreach (char[,] nextstate in NextStates(state, player))
             {
-                double score = Minimax(nextstate, -1, 4);
+                double score = Minimax(nextstate, -1, 5);
                 if (score < idealscore)
                 {
                     idealscore = score;
@@ -461,13 +488,13 @@ namespace Checkers
                 {
                     //if (i == addi && j == addj)
                     //    continue;
-                    if(burnstate[i,j]!='-')
+                    if(IsYours(burnstate,i,j,player))
                     {
                         if (IsAbleEatingLeft(burnstate, player, i, j) || IsAbleEatingRight(burnstate, player, i, j) || (burnstate[i, j] == KingInputFromPlayer(player) && (IsAbleEatingRight(burnstate, -player, i, j) || IsAbleEatingLeft(burnstate, -player, i, j))))
                         {
                             burnstate[i, j] = '-';
                             burnstate[imovedto, jmovedto] = burnstate[imovedfrom, jmovedfrom];
-                            burnstate[imovedfrom ,jmovedfrom] = '-';
+                            burnstate[imovedfrom, jmovedfrom] = '-';
                             return burnstate;
                         }
                     }
@@ -559,6 +586,13 @@ namespace Checkers
                 }
             }
             return newstate;
+        }
+        static int FirstLine(int player, int length)
+        {
+            if (player == 1)
+                return 0;
+            else
+                return length - 1;
         }
         /*           for (int i=0; i<state.GetLength(0); i++)
        {
