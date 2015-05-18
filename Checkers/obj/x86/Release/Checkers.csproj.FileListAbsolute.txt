@@ -1,0 +1,4 @@
+C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\bin\Release\Checkers.exe
+C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\bin\Release\Checkers.pdb
+C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\obj\x86\Release\Checkers.exe
+C:\Users\Meushr1\Desktop\gitfiles\Checkers\Checkers\obj\x86\Release\Checkers.pdb
