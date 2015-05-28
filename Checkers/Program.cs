@@ -126,11 +126,11 @@ namespace Checkers
         private static List<char[,]> NextStates(char[,] state, int player) //add kings. + option to add multiple eating in here.
         {
             List<char[,]> result = new List<char[,]>();
-            for (int i = Convert.ToInt32((1 - player) / 2); i < state.GetLength(0) - 1; i++) //change to (int i = 0; i < state.GetLength(0); i++) if added kings to function
+
+            for (int i = 0; i < state.GetLength(0); i++) //change to (int i = 0; i < state.GetLength(0); i++) if added kings to function
             {
                 for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
                 {
-
                     if (IsYours(state, i, j, player))//הבדיקות נוגעות גם למלכים
                     {   //הבדיקות נוגעות גם למלכים
                         if (IsAbleLeft(state, player, i, j))
@@ -174,32 +174,6 @@ namespace Checkers
             return result;
         }
 
-        //private static void TurnMove(char[,] state, int player, List<char[,]> result, int i, int j, int diffi, int diffj)
-        //{
-        //    //move one step or eat.
-        //    //for regular pieces: diffi>0, diffj!=0.
-        //    //for kings:       *diffi!=0*, diffj!=0
-        //    char[,] tempstate = (char[,])state.Clone();
-        //    if (tempstate[i, j] == InputFromPlayer(player))
-        //        tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
-        //    else if (tempstate[i, j] == KingInputFromPlayer(player))
-        //        tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
-        //    tempstate[i, j] = '-';
-        //    if (diffi == 2)
-        //        tempstate[i + player, j + diffj/2] = '-';
-        //    //Console.WriteLine("tempstate (" + diffi + ", " + diffj + ")" + "after moving:");
-        //    //PrintState(tempstate);
-        //    //Console.WriteLine("\n\n");
-        //    tempstate = Burned(state, tempstate, player);
-        //    //Console.WriteLine("after burn:");
-        //    //PrintState(tempstate);
-        //    //Console.WriteLine("\n\n");
-        //    tempstate = BecomeKing(tempstate, player);
-        //    //Console.WriteLine("tempstate:");
-        //    //PrintState(tempstate);
-        //    //Console.WriteLine("\n\n");
-        //    result.Add(tempstate);
-        //}
 
         private static void TurnMove(char[,] state, int player, List<char[,]> result, int i, int j, int diffi, int diffj)
         {
@@ -207,7 +181,7 @@ namespace Checkers
             //for regular pieces: diffi>0, diffj!=0.
             //for kings:       *diffi!=0*, diffj!=0
             char[,] tempstate = (char[,])state.Clone();
-            tempstate[i + diffi * player, j + diffj] = tempstate[i, j];
+            tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
             tempstate[i, j] = '-';
             if (diffi == 2)
                 tempstate[i + player, j + diffj / 2] = '-';
@@ -255,6 +229,29 @@ namespace Checkers
                 result.Add(tempstate);
             }
         }
+        //private static void TurnMoveBackwards(char[,] state, int player, List<char[,]> result, int i, int j, int diffi, int diffj)
+        //{
+        //    //move one step or eat.
+        //    //for regular pieces: diffi>0, diffj!=0.
+        //    //for kings:       *diffi!=0*, diffj!=0
+        //    char[,] tempstate = (char[,])state.Clone();
+        //    tempstate[i + diffi * player, j + diffj] = tempstate[i, j];
+        //    tempstate[i, j] = '-';
+        //    if (diffi == 2)
+        //        tempstate[i + player, j + diffj / 2] = '-';
+        //    //Console.WriteLine("tempstate (" + diffi + ", " + diffj + ")" + "after moving:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    tempstate = Burned(state, tempstate, player);
+        //    //Console.WriteLine("after burn:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    tempstate = BecomeKing(tempstate, player);
+        //    //Console.WriteLine("tempstate:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    result.Add(tempstate);
+        //}
 
         private static double StateValue(char[,] state, int player) //לשנות כך שיהיה שימוש ב GameOver
         {
@@ -410,21 +407,21 @@ namespace Checkers
         }
         static int GameOver(char[,] state) //updated
         {
-            bool flagwhiteO = false;
-            bool flagblackX = false;
+            bool flagwhite = false;
+            bool flagblack = false;
             for (int i = 0; i < state.GetLength(0); i++)
             {
                 for (int j = (i + 1) % 2; j < state.GetLength(1); j += 2)
                 {
-                    if (state[i, j] == 'X')
-                        flagblackX = true;
-                    else if (state[i, j] == 'O')
-                        flagwhiteO = true;
+                    if (state[i, j] == KingInputFromPlayer(1) || state[i, j] == InputFromPlayer(1))
+                        flagblack = true;
+                    else if (state[i, j] == KingInputFromPlayer(-1) || state[i, j] == InputFromPlayer(-1))
+                        flagwhite = true;
                 }
             }
-            if (!flagwhiteO) //no more white pieces (O)
+            if (!flagwhite) //no more white pieces (O)
                 return 1; //computer won
-            else if (!flagblackX) //no more black pieces (X)
+            else if (!flagblack) //no more black pieces (X)
                 return -1; //player won
             else
                 return 0;
@@ -440,7 +437,8 @@ namespace Checkers
             else
                 player = 1;
 
-            char[,] state = new char[8, 8] {{'-','X','-','X','-','X','-','X'},
+            char[,] state = new char[8, 8] 
+                                           {{'-','X','-','X','-','X','-','X'},
                                             {'X','-','X','-','X','-','X','-'},
                                             {'-','X','-','X','-','X','-','X'},                                           
                                             {'-','-','-','-','-','-','-','-'},
@@ -448,6 +446,15 @@ namespace Checkers
                                             {'O','-','O','-','O','-','O','-'},
                                             {'-','O','-','O','-','O','-','O'},
                                             {'O','-','O','-','O','-','O','-'}};
+            //char[,] state = new char[8, 8]
+                                           //{{'-','-','-','-','-','-','-','-'},
+                                           // {'-','-','-','-','-','-','-','-'},
+                                           // {'-','-','-','-','-','-','-','-'},                                           
+                                           // {'-','-','-','-','-','-','-','-'},
+                                           // {'-','-','-','O','-','-','-','-'},
+                                           // {'-','-','-','-','-','-','-','-'},
+                                           // {'-','-','-','-','-','-','-','-'},
+                                           // {'-','-','-','-','-','-','B','-'}};
             PrintState(state);
             do
             {
@@ -637,7 +644,7 @@ namespace Checkers
                 for (int j = 0; j < newstate.GetLength(1); j += 2)
                 {
                     if (newstate[7, j] == InputFromPlayer(player))
-                        newstate[7, j] = 'W';
+                        newstate[7, j] = 'B';
                 }
             }
             return newstate;
