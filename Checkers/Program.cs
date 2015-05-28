@@ -174,31 +174,86 @@ namespace Checkers
             return result;
         }
 
+        //private static void TurnMove(char[,] state, int player, List<char[,]> result, int i, int j, int diffi, int diffj)
+        //{
+        //    //move one step or eat.
+        //    //for regular pieces: diffi>0, diffj!=0.
+        //    //for kings:       *diffi!=0*, diffj!=0
+        //    char[,] tempstate = (char[,])state.Clone();
+        //    if (tempstate[i, j] == InputFromPlayer(player))
+        //        tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
+        //    else if (tempstate[i, j] == KingInputFromPlayer(player))
+        //        tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
+        //    tempstate[i, j] = '-';
+        //    if (diffi == 2)
+        //        tempstate[i + player, j + diffj/2] = '-';
+        //    //Console.WriteLine("tempstate (" + diffi + ", " + diffj + ")" + "after moving:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    tempstate = Burned(state, tempstate, player);
+        //    //Console.WriteLine("after burn:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    tempstate = BecomeKing(tempstate, player);
+        //    //Console.WriteLine("tempstate:");
+        //    //PrintState(tempstate);
+        //    //Console.WriteLine("\n\n");
+        //    result.Add(tempstate);
+        //}
+
         private static void TurnMove(char[,] state, int player, List<char[,]> result, int i, int j, int diffi, int diffj)
         {
             //move one step or eat.
             //for regular pieces: diffi>0, diffj!=0.
             //for kings:       *diffi!=0*, diffj!=0
             char[,] tempstate = (char[,])state.Clone();
-            if (tempstate[i, j] == InputFromPlayer(player))
-                tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
-            else if (tempstate[i, j] == KingInputFromPlayer(player))
-                tempstate[i + diffi*player, j + diffj] = tempstate[i, j];
+            tempstate[i + diffi * player, j + diffj] = tempstate[i, j];
             tempstate[i, j] = '-';
             if (diffi == 2)
-                tempstate[i + player, j + diffj/2] = '-';
+                tempstate[i + player, j + diffj / 2] = '-';
             //Console.WriteLine("tempstate (" + diffi + ", " + diffj + ")" + "after moving:");
             //PrintState(tempstate);
             //Console.WriteLine("\n\n");
             tempstate = Burned(state, tempstate, player);
+            if (diffi == 2)
+            {
+                state = (char[,])tempstate.Clone();
+                if (IsAbleEatingLeft(tempstate, player, i + diffi * player, j + diffj))
+                {
+                    TurnMove(state, player, result, i + diffi * player, j + diffj, 2, -2);
+                }
+                else if (IsAbleEatingRight(tempstate, player, i + diffi * player, j + diffj))
+                {
+                    TurnMove(state, player, result, i + diffi * player, j + diffj, 2, +2);
+                }
+                else if (IsAbleEatingLeft(tempstate, -player, i + diffi * player, j + diffj))
+                {
+                    TurnMove(state, player, result, i + diffi * player, j + diffj, -2, -2);
+                }
+                else if (IsAbleEatingRight(tempstate, -player, i + diffi * player, j + diffj))
+                {
+                    TurnMove(state, player, result, i + diffi * player, j + diffj, -2, +2);
+                }
+                else
+                {
+                    tempstate = BecomeKing(tempstate, player);
+                    //Console.WriteLine("tempstate:");
+                    //PrintState(tempstate);
+                    //Console.WriteLine("\n\n");
+                    result.Add(tempstate);
+                }
+            }
             //Console.WriteLine("after burn:");
             //PrintState(tempstate);
             //Console.WriteLine("\n\n");
-            tempstate = BecomeKing(tempstate, player);
-            //Console.WriteLine("tempstate:");
-            //PrintState(tempstate);
-            //Console.WriteLine("\n\n");
-            result.Add(tempstate);
+            if (diffi!=2)
+            {
+                tempstate = BecomeKing(tempstate, player);
+                //Console.WriteLine("tempstate:");
+                //PrintState(tempstate);
+                //Console.WriteLine("\n\n");
+                result.Add(tempstate);
+            }
         }
 
         private static double StateValue(char[,] state, int player) //לשנות כך שיהיה שימוש ב GameOver
@@ -438,7 +493,7 @@ namespace Checkers
             char[,] idealstate = null;
             foreach (char[,] nextstate in NextStates(state, player))
             {
-                double score = Minimax(nextstate, -1, 5);
+                double score = Minimax(nextstate, -1, 3);
                 if (score < idealscore)
                 {
                     idealscore = score;
